@@ -22,7 +22,7 @@ SCRIPT = [
     ("priya", "hi", "गुड मॉर्निंग माइक! कल मैंने पेमेंट वाला बग फिक्स कर दिया।", None),
     ("mike", "en", "Nice! Did the refund for the Delhi customer go through?", None),
     ("priya", "hi", "हाँ, साढ़े तीन हज़ार रुपये का रिफंड चला गया।", "3,500|three thousand five hundred"),
-    ("mike", "en", "Great. The client call is at a quarter to nine tomorrow, please don't be late.", None),
+    ("mike", "en", "Great. The client call is at a quarter to nine tomorrow, please don't be late.", "8:45|पौने नौ"),
     ("priya", "hi", "ठीक है। और क्लाइंट का नंबर नोट करो, नौ आठ सात, डबल पाँच, चार तीन दो एक शून्य।", "9875543210|nine eight seven five five four three two one zero"),
     ("mike", "en", "Got it. Last thing, the invoice is one lakh fifty thousand rupees, send it by Friday.", "1,50,000|डेढ़ लाख|एक लाख पचास हज़ार"),
 ]
@@ -104,10 +104,14 @@ async def main(url):
         cap = next((c for c in other.caps if c["cid"] == h["cid"]), {})
         ok = None
         if check:
-            ok = any(k.lower() in (h["text"] + " " + cap.get("locked", "")).lower() for k in check.split("|"))
+            ok = any(k.lower() in h["text"].lower() for k in check.split("|"))   # the translation itself, not our own lock
         report.append({"who": who, "said": text, "heard_as": cap.get("heard"), "locked": cap.get("locked"),
                        "other_hears": h["text"], "delay_s": round(h["t"] - t_stop, 2),
                        "server_latency_s": h["latency_ms"] / 1000, "steps_ms": other.timing.get(h["cid"], {}).get("ms"), "numbers_ok": ok})
+        clipdir = os.path.join(ROOT, "runs", "clips"); os.makedirs(clipdir, exist_ok=True)
+        n = len(report)
+        sf.write(os.path.join(clipdir, f"{n:02d}_said.wav"), wav, 16000)
+        sf.write(os.path.join(clipdir, f"{n:02d}_heard.wav"), h["pcm"], 24000)
         convo += [wav, np.zeros(4000, np.float32),
                   np.interp(np.arange(0, len(h["pcm"]), 1.5), np.arange(len(h["pcm"])), h["pcm"]).astype(np.float32),
                   np.zeros(8000, np.float32)]

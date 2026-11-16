@@ -6,6 +6,8 @@ Yap is a live call translator that runs fully on a laptop. You speak Hindi (or H
 hears English **in your voice**, about 4 seconds later. They reply in English, and you hear Hindi in **their** voice.
 No cloud, no API keys, no account. Your voice never leaves the machine.
 
+https://github.com/mayankvashishtt/yap/raw/main/docs/demo.mp4
+
 ![A call in Yap: Priya speaks Hindi, Mike reads and hears English, and every number is locked](docs/call.png)
 
 ## Why
@@ -21,17 +23,18 @@ Voice translation already exists in big meeting apps. Yap tries three things the
 ```
 mic ──► VAD ──► hear ──► number lock ──► translate ──► numbers → words ──► speak ──► convert voice ──► listener
        Silero   Whisper   Indian number    Gemma 3 4B    ₹3,500 → "three       Kokoro    Chatterbox S3Gen
-                turbo     parser           (MLX)         thousand five         82M       (the speaker's own voice)
+                large-v3  parser           (MLX)         thousand five         82M       (the speaker's own voice)
                 (MLX)                                    hundred rupees"
 ```
 
 1. **Hear.** The browser streams your mic over a WebSocket. Silero VAD decides when you stopped talking,
-   and Whisper large-v3 turbo (MLX, on the Apple GPU) writes it down. It's told this is an Indian call, so
+   and Whisper large-v3 (MLX, on the Apple GPU) writes it down. It's told this is an Indian call, so
    "lakh" isn't heard as "lock".
 2. **Number lock.** Before the translator sees the line, every spoken number is parsed into digits:
    `साढ़े तीन हज़ार रुपये → ₹3,500`, `पौने नौ बजे → 8:45`, `नौ आठ सात डबल पाँच… → 9875543210`.
    The translator only has to copy digits, which LLMs do reliably.
-3. **Translate.** Gemma 3 4B (4-bit, MLX), prompted as a live interpreter.
+3. **Translate.** Gemma 3 4B (4-bit, MLX), prompted as a live interpreter. A **number guard** checks that
+   every locked number made it into the translation. If one is missing, it translates again and names the numbers.
 4. **Numbers back to words**, the way the listener says them: `₹1,50,000 → डेढ़ लाख रुपये` or
    `one lakh fifty thousand rupees`.
 5. **Speak, then make it sound like you.** Kokoro-82M makes fast generic speech, then Chatterbox's S3Gen
@@ -49,18 +52,35 @@ through the real server over real WebSockets in real time.
 
 | Said | Heard on the other side | First sound after they stopped |
 |---|---|---|
-| हाँ, साढ़े तीन हज़ार रुपये का रिफंड चला गया। | Yeah, I sent back ₹3,500. | 3.8 s |
+| हाँ, साढ़े तीन हज़ार रुपये का रिफंड चला गया। | Yeah, the ₹3,500 refund's gone through. | 3.8 s |
 | The client call is at a quarter to nine tomorrow… | कल सुबह 8:45 बजे क्लाइंट कॉल है। | 2.4 s |
-| …नंबर नोट करो, नौ आठ सात, डबल पाँच, चार तीन दो एक शून्य। | Okay, and note the client's number, 9875543210 | 4.0 s |
+| …नंबर नोट करो, नौ आठ सात, डबल पाँच, चार तीन दो एक शून्य। | Okay, and note the client's number 9875**5**543210 ❌ | 4.4 s |
 | …the invoice is one lakh fifty thousand rupees… | चालान ₹1,50,000 का है। | 4.2 s |
 
-Median first-sound delay **3.9 s** (including 0.55 s to be sure you stopped talking). Numbers correct
-**3/3**. Full run: [`results/standup_bots.json`](results/standup_bots.json), audio:
+Median first-sound delay **3.7 s** (including 0.55 s to be sure you stopped talking). Numbers correct
+**3 of 4 on every run** (the check reads the translation the listener gets, not Yap's own lock). The miss is
+real: Whisper hears "डबल पाँच" as 555, so the phone number gets an extra digit. Delays are from a run on a quiet Mac. The ₹3,500 line shows the
+translation with the number guard on (without it, Gemma once said "the refund is processing" and dropped the
+amount). Runs: [`results/standup_bots_guard.json`](results/standup_bots_guard.json), older: [`results/standup_bots.json`](results/standup_bots.json), audio:
 [`results/standup_bots.wav`](results/standup_bots.wav).
 
 **What the number lock fixes.** Without it, the same translator wrote *पौने नौ बजे* (8:45) as
 "half-past nine", added a digit to a phone number, and turned "one lakh fifty thousand" (heard as
 "one lock 50,000") into ₹50,000.
+
+**Which Whisper? Measured, not guessed** (`bench/stt_choice.py`). Yap's own hear step on 170 spoken
+Hindi lines full of numbers (साढ़े/सवा/पौने, lakh, OTPs, phone numbers, times), read by a synthetic voice and
+played through different conditions. A line counts only if the exact number comes out.
+
+| Model | Clean | Phone line | Street noise | Time per line |
+|---|---|---|---|---|
+| Whisper large-v3 turbo | 65% | 66% | 61% | 0.27 s |
+| **Whisper large-v3 (Yap)** | **87%** | **82%** | **88%** | 0.72 s |
+
+Turbo is 3x faster but drops a third of the numbers, mostly साढ़े/पौने fractions. 0.45 s is worth it.
+Both collapse on a far-away speaker mixed with crowd noise over a phone line (10% or less), so that is
+the next thing to fix. Adding "phone numbers have डबल" to Whisper's hint fixed the 555 line above but made
+2–4 other lines worse, so it's not in.
 
 **Voice conversion speed vs voice match** (`bench/vc_steps.py`). Fewer diffusion steps, same voice:
 
@@ -93,7 +113,7 @@ Test without a microphone, in another terminal:
 PYTHONPATH=. .venv/bin/python -m yap.bots
 ```
 
-Settings: `YAP_MT` picks another MLX translation model (e.g. `mlx-community/gemma-3-12b-it-4bit`),
+Settings: `YAP_STT=mlx-community/whisper-large-v3-turbo` is faster on smaller Macs (fewer numbers right), `YAP_MT` picks another MLX translation model (e.g. `mlx-community/gemma-3-12b-it-4bit`),
 `YAP_VC_STEPS` trades voice quality for speed, `PORT` changes the port.
 
 ## Code
@@ -106,7 +126,7 @@ Settings: `YAP_MT` picks another MLX translation model (e.g. `mlx-community/gemm
 | `yap/numbers.py` | Indian number words 0–99, साढ़े/सवा/पौने/डेढ़/ढाई, lakh/crore, both directions |
 | `yap/bots.py` | two-bot standup over the real server: delay and number checks |
 | `static/` | the browser client (Web Audio, AudioWorklet mic at 16 kHz) |
-| `bench/` | voice-conversion speed and voice-match measurements |
+| `bench/` | Whisper choice, voice-conversion speed and voice-match measurements |
 
 ## Limits, honestly
 
@@ -114,6 +134,8 @@ Settings: `YAP_MT` picks another MLX translation model (e.g. `mlx-community/gemm
 - Turn-based, like a human interpreter: you finish a sentence, then it's translated. About 4 s.
 - One Mac runs the models for everyone on the call. It's tested with 2–3 people, not 20.
 - Small words still slip: "Delhi" was once heard as "deli", and "payment" as "pemet".
+- Digit strings with "double" can gain a digit (डबल पाँच → 555). Read phone numbers back before you dial.
+- Very noisy, far-away speech on a bad line breaks number hearing for every Whisper we tried.
 - Use headphones. The mic pauses during playback, but speakers next to a mic are still a bad idea.
 
 ## Use it responsibly

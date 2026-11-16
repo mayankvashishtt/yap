@@ -1,6 +1,6 @@
 """The interpreter: one spoken line in, the same line in another language and the same voice out.
 
-hear (Whisper turbo, MLX)  ->  number lock  ->  translate (Gemma 3, MLX)  ->  numbers back to words
+hear (Whisper large-v3, MLX)  ->  number lock  ->  translate (Gemma 3, MLX)  ->  numbers back to words
 ->  speak (Kokoro, fast generic voice)  ->  voice convert to the speaker (Chatterbox S3Gen, MPS)
 
 Everything runs on the Mac. Every output is watermarked as AI audio (Perth), like Chatterbox ships it.
@@ -9,6 +9,7 @@ Models are not thread safe: call Engine from one worker thread only.
 from __future__ import annotations
 
 import os
+import re
 import time
 
 os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
@@ -19,7 +20,7 @@ import torch
 
 from .numlock import lock, speak_numbers
 
-STT_MODEL = "mlx-community/whisper-large-v3-turbo"
+STT_MODEL = os.environ.get("YAP_STT", "mlx-community/whisper-large-v3-mlx")   # bench/stt_choice.py
 MT_MODEL = os.environ.get("YAP_MT", "mlx-community/gemma-3-4b-it-4bit")
 LANGS = {"hi": ("Hindi", "h", "hf_alpha", "Hindi (Devanagari script)"),
          "en": ("English", "a", "af_heart", "English")}
@@ -32,6 +33,15 @@ VC_STEPS = int(os.environ.get("YAP_VC_STEPS", "4"))   # 4 = same voice match as 
 # tells Whisper this is an Indian call, so 'lakh' isn't heard as 'lock'
 HINT = {"en": "Indian English call. Amounts in rupees, lakh and crore, like 1 lakh 50 thousand rupees.",
         "hi": "हिंदी और English मिली हुई बातचीत। रुपये, लाख, करोड़, साढ़े तीन हज़ार, सवा, पौने।"}
+
+
+_NUM = re.compile(r"₹?\d[\d,]*(?::\d\d)?")
+
+
+def missing_numbers(src: str, out: str) -> list[str]:
+    """Locked numbers in src (₹3,500, 8:45, 9875543210) that the translation dropped or changed."""
+    have = {re.sub(r"[₹,]", "", m) for m in _NUM.findall(out)}
+    return [m for m in _NUM.findall(src) if len(re.sub(r"\D", "", m)) >= 2 and re.sub(r"[₹,]", "", m) not in have]
 
 
 class Engine:
@@ -71,9 +81,17 @@ class Engine:
 
     def translate(self, text: str, tgt: str) -> str:
         from mlx_lm import generate
-        msgs = [{"role": "user", "content": MT_PROMPT.format(tgt=LANGS[tgt][3], text=text)}]
-        prompt = self.tok.apply_chat_template(msgs, add_generation_prompt=True)
-        return generate(self.mt, self.tok, prompt=prompt, max_tokens=160).strip()
+        prompt_text = MT_PROMPT.format(tgt=LANGS[tgt][3], text=text)
+        out = ""
+        for _ in range(2):   # number guard: if a locked number went missing, retry once naming it
+            msgs = [{"role": "user", "content": prompt_text}]
+            prompt = self.tok.apply_chat_template(msgs, add_generation_prompt=True)
+            out = generate(self.mt, self.tok, prompt=prompt, max_tokens=160).strip()
+            missing = missing_numbers(text, out)
+            if not missing:
+                break
+            prompt_text += "\n\nYour translation must contain these numbers exactly: " + ", ".join(missing)
+        return out
 
     def speak_generic(self, text: str, lang: str) -> np.ndarray:
         parts = [np.asarray(a) for _, _, a in self.kokoro[lang](text, voice=LANGS[lang][2])]

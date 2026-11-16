@@ -1,0 +1,86 @@
+[
+ {
+  "who": "priya",
+  "said": "गुड मॉर्निंग माइक! कल मैंने पेमेंट वाला बग फिक्स कर दिया।",
+  "heard_as": "Good morning, Mike. कल मैंने payment वाला bug fix कर दिया.",
+  "locked": "Good morning, Mike. कल मैंने payment वाला bug fix कर दिया.",
+  "other_hears": "Morning, Mike. I fixed the payment bug yesterday.",
+  "delay_s": 4.87,
+  "server_latency_s": 4.524,
+  "steps_ms": {
+   "hear": 1547,
+   "translate_en": 771
+  },
+  "numbers_ok": null
+ },
+ {
+  "who": "mike",
+  "said": "Nice! Did the refund for the Delhi customer go through?",
+  "heard_as": "Nice, did the refund for the Delhi customer go through.",
+  "locked": "Nice, did the refund for the Delhi customer go through.",
+  "other_hears": "अच्छा, दिल्ली वाले का रिफंड तो हो गया ना?\nअच्छा, दिल्ली वाले का रिफंड तो हो गया ना?",
+  "delay_s": 4.08,
+  "server_latency_s": 3.832,
+  "steps_ms": {
+   "hear": 687,
+   "translate_hi": 1028
+  },
+  "numbers_ok": null
+ },
+ {
+  "who": "priya",
+  "said": "हाँ, साढ़े तीन हज़ार रुपये का रिफंड चला गया।",
+  "heard_as": "हाँ, साढ़े तीन हज़ार रुपये का रिफंड चला गया।",
+  "locked": "हाँ, ₹3,500 का रिफंड चला गया।",
+  "other_hears": "Yeah, the ₹3,500 refund's gone through.",
+  "delay_s": 5.86,
+  "server_latency_s": 5.546,
+  "steps_ms": {
+   "hear": 1840,
+   "translate_en": 1361
+  },
+  "numbers_ok": true
+ },
+ {
+  "who": "mike",
+  "said": "Great. The client call is at a quarter to nine tomorrow, please don't be late.",
+  "heard_as": "Great. The client call is at a quarter to nine tomorrow. Please don't be late.",
+  "locked": "Great. The client call is at a quarter to 9 tomorrow. Please don't be late.",
+  "other_hears": "ठीक है। कल सुबह 8:45 बजे क्लाइंट कॉल है। देर न करें।",
+  "delay_s": 3.81,
+  "server_latency_s": 3.493,
+  "steps_ms": {
+   "hear": 771,
+   "translate_hi": 730
+  },
+  "numbers_ok": true
+ },
+ {
+  "who": "priya",
+  "said": "ठीक है। और क्लाइंट का नंबर नोट करो, नौ आठ सात, डबल पाँच, चार तीन दो एक शून्य।",
+  "heard_as": "ठीक है और क्लाइंट का नंबर नोट करो 987 555 43210",
+  "locked": "ठीक है और क्लाइंट का नंबर नोट करो 98755543210",
+  "other_hears": "Okay, and note the client's number 98755543210",
+  "delay_s": 8.29,
+  "server_latency_s": 7.829,
+  "steps_ms": {
+   "hear": 3661,
+   "translate_en": 1336
+  },
+  "numbers_ok": false
+ },
+ {
+  "who": "mike",
+  "said": "Got it. Last thing, the invoice is one lakh fifty thousand rupees, send it by Friday.",
+  "heard_as": "Got it. Last thing the invoice is 1 lakh 50 thousand rupees. Send it by Friday.",
+  "locked": "Got it. Last thing the invoice is ₹1,50,000. Send it by Friday.",
+  "other_hears": "ठीक है। आखिरी बात है कि बिल ₹1,50,000 है। शुक्रवार तक भेजना।",
+  "delay_s": 4.69,
+  "server_latency_s": 4.395,
+  "steps_ms": {
+   "hear": 974,
+   "translate_hi": 1124
+  },
+  "numbers_ok": true
+ }
+]

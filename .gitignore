@@ -5,3 +5,6 @@ logs/
 runs/
 bench/out_*.wav
 .DS_Store
+posts/
+server.log
+bench/*.log

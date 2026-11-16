@@ -1,0 +1,37 @@
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s0.png'
+duration 3.350
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s1.png'
+duration 4.500
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s1.png'
+duration 0.500
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s2.png'
+duration 4.270
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s2.png'
+duration 0.850
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s3.png'
+duration 5.775
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s3.png'
+duration 0.500
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s4.png'
+duration 6.230
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s4.png'
+duration 0.850
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s5.png'
+duration 7.150
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s5.png'
+duration 0.500
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s6.png'
+duration 6.030
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s6.png'
+duration 0.850
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s7.png'
+duration 6.525
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s7.png'
+duration 0.500
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s8.png'
+duration 7.550
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s8.png'
+duration 0.850
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s9.png'
+duration 3.650
+file '/Users/mayankvashishtt/Desktop/Main /polyglot/demo/build/s9.png'
