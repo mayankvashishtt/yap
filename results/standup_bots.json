@@ -1,0 +1,68 @@
+[
+ {
+  "who": "priya",
+  "said": "गुड मॉर्निंग माइक! कल मैंने पेमेंट वाला बग फिक्स कर दिया।",
+  "heard_as": "गुड मॉर्निंग माइक, कल मैंने पेमेट वाला बग फिक्स कर दिया।",
+  "locked": "गुड मॉर्निंग माइक, कल मैंने पेमेट वाला बग फिक्स कर दिया।",
+  "other_hears": "Good morning Mike, I fixed the pemet bug yesterday.",
+  "delay_s": 4.3,
+  "server_latency_s": 3.956,
+  "steps_ms": null,
+  "numbers_ok": null
+ },
+ {
+  "who": "mike",
+  "said": "Nice! Did the refund for the Delhi customer go through?",
+  "heard_as": "Nice, did the refund for the deli customer go through.",
+  "locked": "Nice, did the refund for the deli customer go through.",
+  "other_hears": "अच्छा, डेली ग्राहक का रिफंड तो हो गया क्या?",
+  "delay_s": 3.03,
+  "server_latency_s": 2.802,
+  "steps_ms": null,
+  "numbers_ok": null
+ },
+ {
+  "who": "priya",
+  "said": "हाँ, साढ़े तीन हज़ार रुपये का रिफंड चला गया।",
+  "heard_as": "हाँ साढ़े तीन हजार, रुपये का रिफंट चला गया।",
+  "locked": "हाँ ₹3,500 का रिफंट चला गया।",
+  "other_hears": "Yeah, I sent back ₹3,500.",
+  "delay_s": 3.82,
+  "server_latency_s": 3.503,
+  "steps_ms": null,
+  "numbers_ok": true
+ },
+ {
+  "who": "mike",
+  "said": "Great. The client call is at a quarter to nine tomorrow, please don't be late.",
+  "heard_as": "Great. The client call is at a quarter to nine tomorrow. Please don't be late.",
+  "locked": "Great. The client call is at a quarter to 9 tomorrow. Please don't be late.",
+  "other_hears": "ठीक है। कल सुबह 8:45 बजे क्लाइंट कॉल है। देर न करें।",
+  "delay_s": 2.43,
+  "server_latency_s": 2.106,
+  "steps_ms": null,
+  "numbers_ok": null
+ },
+ {
+  "who": "priya",
+  "said": "ठीक है। और क्लाइंट का नंबर नोट करो, नौ आठ सात, डबल पाँच, चार तीन दो एक शून्य।",
+  "heard_as": "ठीक है और क्लाइंट का नंबर नोट करो, 987 55 43 210",
+  "locked": "ठीक है और क्लाइंट का नंबर नोट करो, 9875543210",
+  "other_hears": "Okay, and note the client's number, 9875543210",
+  "delay_s": 4.05,
+  "server_latency_s": 3.574,
+  "steps_ms": null,
+  "numbers_ok": true
+ },
+ {
+  "who": "mike",
+  "said": "Got it. Last thing, the invoice is one lakh fifty thousand rupees, send it by Friday.",
+  "heard_as": "Got it, last thing the invoice is 1 lakh 50 thousand rupees. Send it by Friday.",
+  "locked": "Got it, last thing the invoice is ₹1,50,000. Send it by Friday.",
+  "other_hears": "ठीक है, आखिरी बात है कि चालान ₹1,50,000 का है। शुक्रवार तक भेजना।",
+  "delay_s": 4.21,
+  "server_latency_s": 3.897,
+  "steps_ms": null,
+  "numbers_ok": true
+ }
+]
